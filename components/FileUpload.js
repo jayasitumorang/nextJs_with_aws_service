@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Image from "next/image";
 
 export default function FileUpload() {
   const [file, setFile] = useState(null);
@@ -103,11 +104,13 @@ export default function FileUpload() {
         }}
       >
         {imageList.map((img, index) => (
-          <img
+          <Image
             key={index}
             src={img}
             alt={`Uploaded ${index}`}
-            style={{ width: "100%", borderRadius: 8 }}
+            width={500}               // required - adjust as needed
+            height={500}              // required - adjust as needed
+            style={{ width: "100%", borderRadius: 8, height: "auto" }}
           />
         ))}
       </div>

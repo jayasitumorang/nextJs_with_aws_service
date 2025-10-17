@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Home() {
   const [menuImages, setMenuImages] = useState([]);
@@ -74,7 +75,7 @@ export default function Home() {
           zIndex: 2,
         }}
       >
-        <h2 style={{ fontSize: "1.8rem", color: "#e63946" }}>🍔 Burger's Restaurant</h2>
+        <h2 style={{ fontSize: "1.8rem", color: "#e63946" }}>🍔 Burgers Restaurant</h2>
         <button
           onClick={() => setShowLogin(true)}
           style={{
@@ -134,9 +135,11 @@ export default function Home() {
               boxShadow: "0 5px 15px rgba(0,0,0,0.5)",
             }}
           >
-            <img
+          <Image
               src={img}
               alt={`Menu ${index}`}
+              width={300}      // You MUST provide width and height
+              height={200}
               style={{ width: "100%", height: 200, objectFit: "cover" }}
             />
             <p style={{ margin: "10px 0", color: "#e63946", fontWeight: "bold" }}>Menu Item</p>
