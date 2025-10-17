@@ -46,6 +46,8 @@ export default function FileUpload() {
       // 3️⃣ Immediately update the gallery
       const newFileUrl = `https://restaurant-menu-uploads-12345.s3.ap-southeast-2.amazonaws.com/uploads/${encodeURIComponent(file.name)}`;
       setImageList((prev) => [newFileUrl, ...prev]);
+
+      await fetchImages();
     } catch (err) {
       console.error(err);
       setMessage(`❌ Upload failed: ${err?.message || err}`);

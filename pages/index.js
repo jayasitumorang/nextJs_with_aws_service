@@ -74,7 +74,7 @@ export default function Home() {
           zIndex: 2,
         }}
       >
-        <h2 style={{ fontSize: "1.8rem", color: "#e63946" }}>🍔 Burger Restaurant</h2>
+        <h2 style={{ fontSize: "1.8rem", color: "#e63946" }}>🍔 Burger's Restaurant</h2>
         <button
           onClick={() => setShowLogin(true)}
           style={{
