@@ -1,115 +1,239 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+"use client";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const [menuImages, setMenuImages] = useState([]);
+  const [loadingMenu, setLoadingMenu] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginMessage, setLoginMessage] = useState("");
+
+  const router = useRouter();
+
+  useEffect(() => {
+    fetchMenuImages();
+  }, []);
+
+  const fetchMenuImages = async () => {
+    try {
+      const res = await axios.get(
+        "https://adu23ievdvvmzyds72amfc27mq0fvsxh.lambda-url.ap-southeast-2.on.aws/"
+      );
+      setMenuImages(res.data.images || []);
+    } catch (err) {
+      console.error("Failed to fetch menu images:", err);
+    } finally {
+      setLoadingMenu(false);
+    }
+  };
+
+  const handleLogin = () => {
+    const envUser = process.env.NEXT_PUBLIC_ADMIN_USER;
+    const envPass = process.env.NEXT_PUBLIC_ADMIN_PASS;
+
+    if (username === envUser && password === envPass) {
+      router.push("/upload"); // Navigate to upload page
+    } else {
+      setLoginMessage("❌ Invalid credentials");
+    }
+  };
+
   return (
     <div
-      className={`${geistSans.className} ${geistMono.className} font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20`}
+      style={{
+        fontFamily: "'Poppins', sans-serif",
+        color: "#fff",
+        minHeight: "100vh",
+        background: "url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover",
+        position: "relative",
+      }}
     >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              pages/index.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0,0,0,0.6)",
+          zIndex: 1,
+        }}
+      />
+
+      {/* Navbar */}
+      <nav
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "10px 40px",
+          position: "relative",
+          zIndex: 2,
+        }}
+      >
+        <h2 style={{ fontSize: "1.8rem", color: "#e63946" }}>🍔 Burger Restaurant</h2>
+        <button
+          onClick={() => setShowLogin(true)}
+          style={{
+            padding: "8px 16px",
+            borderRadius: 6,
+            background: "#e63946",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Admin Login
+        </button>
+      </nav>
+
+      {/* Hero */}
+      <section
+        style={{
+          position: "relative",
+          zIndex: 2,
+          textAlign: "center",
+          minHeight: "60vh",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: "0 20px",
+        }}
+      >
+        <h1 style={{ fontSize: "3rem", marginBottom: 10 }}>Delicious Burgers Await!</h1>
+        <p style={{ fontSize: "1.2rem", color: "#ccc", maxWidth: 600, margin: "0 auto" }}>
+          Browse our menu and enjoy fresh, juicy burgers.
+        </p>
+      </section>
+
+      {/* Menu */}
+      <section
+        style={{
+          position: "relative",
+          zIndex: 2,
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+          gap: 20,
+          padding: "40px",
+          background: "rgba(0,0,0,0.5)",
+        }}
+      >
+        {loadingMenu && <p>Loading menu...</p>}
+        {!loadingMenu && menuImages.length === 0 && <p>No menu images available.</p>}
+        {menuImages.map((img, index) => (
+          <div
+            key={index}
+            style={{
+              background: "#1f1f1f",
+              borderRadius: 12,
+              overflow: "hidden",
+              textAlign: "center",
+              boxShadow: "0 5px 15px rgba(0,0,0,0.5)",
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+            <img
+              src={img}
+              alt={`Menu ${index}`}
+              style={{ width: "100%", height: 200, objectFit: "cover" }}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <p style={{ margin: "10px 0", color: "#e63946", fontWeight: "bold" }}>Menu Item</p>
+          </div>
+        ))}
+      </section>
+
+      {/* Login Modal */}
+      {showLogin && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0,0,0,0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: "#222",
+              padding: 30,
+              borderRadius: 12,
+              width: "100%",
+              maxWidth: 400,
+              textAlign: "center",
+            }}
           >
-            Read our docs
-          </a>
+            <h2 style={{ marginBottom: 15 }}>Admin Login</h2>
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              style={{
+                width: "80%",
+                padding: 10,
+                marginBottom: 10,
+                borderRadius: 6,
+                border: "1px solid #555",
+                background: "#111",
+                color: "#fff",
+              }}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{
+                width: "80%",
+                padding: 10,
+                marginBottom: 10,
+                borderRadius: 6,
+                border: "1px solid #555",
+                background: "#111",
+                color: "#fff",
+              }}
+            />
+            <div>
+              <button
+                onClick={handleLogin}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 6,
+                  background: "#457b9d",
+                  color: "#fff",
+                  border: "none",
+                  cursor: "pointer",
+                  marginRight: 10,
+                }}
+              >
+                Login
+              </button>
+              <button
+                onClick={() => setShowLogin(false)}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 6,
+                  background: "#aaa",
+                  color: "#000",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+            {loginMessage && <p style={{ marginTop: 10 }}>{loginMessage}</p>}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
     </div>
   );
 }
